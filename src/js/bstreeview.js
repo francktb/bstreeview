@@ -33,8 +33,8 @@
     };
     /**
      * BsTreeview Plugin constructor.
-     * @param {*} element 
-     * @param {*} options 
+     * @param {*} element
+     * @param {*} options
      */
     function bstreeView(element, options) {
         this.element = element;
@@ -84,7 +84,7 @@
         },
         /**
          * Initialize treeview Data.
-         * @param {*} node 
+         * @param {*} node
          */
         initData: function (node) {
             if (!node.nodes) return;
@@ -103,9 +103,9 @@
         },
         /**
          * Build treeview.
-         * @param {*} parentElement 
-         * @param {*} nodes 
-         * @param {*} depth 
+         * @param {*} parentElement
+         * @param {*} nodes
+         * @param {*} depth
          */
         build: function (parentElement, nodes, depth) {
             var _this = this;
@@ -148,6 +148,12 @@
                 // Add custom id to node if present
                 if (node.id) {
                     treeItem.attr('id', node.id);
+                }
+                // Add custom data attributes if present
+                if (node.dataset) {
+                    $.each(node.dataset, function(key, value) {
+                        treeItem.attr('data-' + key, value);
+                    });
                 }
                 // Attach node to parent.
                 parentElement.append(treeItem);
