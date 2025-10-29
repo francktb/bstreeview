@@ -29,7 +29,8 @@
         treeviewItem: '<div role="treeitem" class="list-group-item" data-toggle="collapse"></div>',
         treeviewGroupItem: '<div role="group" class="list-group collapse" id="itemid"></div>',
         treeviewItemStateIcon: '<i class="state-icon"></i>',
-        treeviewItemIcon: '<i class="item-icon"></i>'
+        treeviewItemIcon: '<i class="item-icon"></i>',
+        treeviewItemBadge: '<span class="badge badge-secondary badge-pill float-right"></span>',
     };
     /**
      * BsTreeview Plugin constructor.
@@ -149,11 +150,21 @@
                 if (node.id) {
                     treeItem.attr('id', node.id);
                 }
+                // Add custom id to node if present
+                if (node.badge) {
+                    treeItem.attr('id', node.id);
+                }
                 // Add custom data attributes if present
                 if (node.dataset) {
                     $.each(node.dataset, function(key, value) {
                         treeItem.attr('data-' + key, value);
                     });
+                }
+                // Add badge info
+                if (node.badge) {
+                    var treeItemBadge = $(templates.treeviewItemBadge);
+                    treeItemBadge.text(node.badge);
+                    treeItem.append(treeItemBadge);
                 }
                 // Attach node to parent.
                 parentElement.append(treeItem);
