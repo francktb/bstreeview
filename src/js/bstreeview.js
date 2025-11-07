@@ -16,6 +16,7 @@
         defaults = {
             expandIcon: 'fa fa-angle-down fa-fw',
             collapseIcon: 'fa fa-angle-right fa-fw',
+            noNodesIcon: 'fa fa-times fa-fw',
             indent: 1.25,
             parentsMarginLeft: '1.25rem',
             openNodeLinkOnNewTab: true
@@ -28,13 +29,15 @@
         treeview: '<div class="bstreeview"></div>',
         treeviewItem: '<div role="treeitem" class="list-group-item" data-toggle="collapse"></div>',
         treeviewGroupItem: '<div role="group" class="list-group collapse" id="itemid"></div>',
+        treeviewGroupItemShow: '<div role="group" class="list-group collapse show" id="itemid"></div>',
         treeviewItemStateIcon: '<i class="state-icon"></i>',
-        treeviewItemIcon: '<i class="item-icon"></i>'
+        treeviewItemIcon: '<i class="item-icon"></i>',
+        treeviewItemBadge: '<span class="badge badge-secondary badge-pill float-right"></span>',
     };
     /**
      * BsTreeview Plugin constructor.
-     * @param {*} element 
-     * @param {*} options 
+     * @param {*} element
+     * @param {*} options
      */
     function bstreeView(element, options) {
         this.element = element;
@@ -67,7 +70,7 @@
             var _this = this;
             this.build($(this.element), this.tree, 0);
             // Update angle icon on collapse
-            $(this.element).on('click', '.list-group-item', function (e) {
+            $(this.element).off('click').on('click', '.list-group-item', function (e) {
                 $('.state-icon', this)
                     .toggleClass(_this.settings.expandIcon)
                     .toggleClass(_this.settings.collapseIcon);
@@ -84,7 +87,7 @@
         },
         /**
          * Initialize treeview Data.
-         * @param {*} node 
+         * @param {*} node
          */
         initData: function (node) {
             if (!node.nodes) return;
@@ -103,9 +106,9 @@
         },
         /**
          * Build treeview.
-         * @param {*} parentElement 
-         * @param {*} nodes 
-         * @param {*} depth 
+         * @param {*} parentElement
+         * @param {*} nodes
+         * @param {*} depth
          */
         build: function (parentElement, nodes, depth) {
             var _this = this;
@@ -118,17 +121,29 @@
             depth += 1;
             // Add each node and sub-nodes.
             $.each(nodes, function addNodes(id, node) {
+                const expanded = node.state && true === node.state.expanded;
+
                 // Main node element.
                 var treeItem = $(templates.treeviewItem)
                     .attr('data-target', "#" + _this.itemIdPrefix + node.nodeId)
                     .attr('style', 'padding-left:' + leftPadding)
                     .attr('aria-level', depth);
                 // Set Expand and Collapse icones.
+                var treeItemStateIcon;
                 if (node.nodes) {
-                    var treeItemStateIcon = $(templates.treeviewItemStateIcon)
-                        .addClass(_this.settings.collapseIcon);
-                    treeItem.append(treeItemStateIcon);
+                    if(expanded) {
+                        treeItemStateIcon = $(templates.treeviewItemStateIcon)
+                            .addClass(_this.settings.expandIcon);
+                    } else {
+                        treeItemStateIcon = $(templates.treeviewItemStateIcon)
+                            .addClass(_this.settings.collapseIcon);
+                    }
+                } else if(node.icon != '') {
+                    treeItemStateIcon = $(templates.treeviewItemStateIcon)
+                        .addClass(_this.settings.noNodesIcon);
                 }
+                treeItem.append(treeItemStateIcon);
+
                 // set node icon if exist.
                 if (node.icon) {
                     var treeItemIcon = $(templates.treeviewItemIcon)
@@ -149,13 +164,35 @@
                 if (node.id) {
                     treeItem.attr('id', node.id);
                 }
+                // Add custom id to node if present
+                if (node.badge) {
+                    treeItem.attr('id', node.id);
+                }
+                // Add custom data attributes if present
+                if (node.dataset) {
+                    $.each(node.dataset, function(key, value) {
+                        treeItem.attr('data-' + key, value);
+                    });
+                }
+                // Add badge info
+                if (node.badge) {
+                    var treeItemBadge = $(templates.treeviewItemBadge);
+                    treeItemBadge.text(node.badge);
+                    treeItem.append(treeItemBadge);
+                }
                 // Attach node to parent.
                 parentElement.append(treeItem);
                 // Build child nodes.
                 if (node.nodes) {
                     // Node group item.
-                    var treeGroup = $(templates.treeviewGroupItem)
-                        .attr('id', _this.itemIdPrefix + node.nodeId);
+                    if(expanded) {
+                        var treeGroup = $(templates.treeviewGroupItemShow)
+                            .attr('id', _this.itemIdPrefix + node.nodeId);
+                    } else {
+                        var treeGroup = $(templates.treeviewGroupItem)
+                            .attr('id', _this.itemIdPrefix + node.nodeId);
+                    }
+
                     parentElement.append(treeGroup);
                     _this.build(treeGroup, node.nodes, depth);
                 }
