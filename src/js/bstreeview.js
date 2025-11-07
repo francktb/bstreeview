@@ -16,6 +16,7 @@
         defaults = {
             expandIcon: 'fa fa-angle-down fa-fw',
             collapseIcon: 'fa fa-angle-right fa-fw',
+            noNodesIcon: 'fa fa-times fa-fw',
             indent: 1.25,
             parentsMarginLeft: '1.25rem',
             openNodeLinkOnNewTab: true
@@ -125,11 +126,16 @@
                     .attr('style', 'padding-left:' + leftPadding)
                     .attr('aria-level', depth);
                 // Set Expand and Collapse icones.
+                var treeItemStateIcon;
                 if (node.nodes) {
-                    var treeItemStateIcon = $(templates.treeviewItemStateIcon)
+                    treeItemStateIcon = $(templates.treeviewItemStateIcon)
                         .addClass(_this.settings.collapseIcon);
-                    treeItem.append(treeItemStateIcon);
+                } else {
+                    treeItemStateIcon = $(templates.treeviewItemStateIcon)
+                        .addClass(_this.settings.noNodesIcon);
                 }
+                treeItem.append(treeItemStateIcon);
+
                 // set node icon if exist.
                 if (node.icon) {
                     var treeItemIcon = $(templates.treeviewItemIcon)
