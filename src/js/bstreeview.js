@@ -29,6 +29,7 @@
         treeview: '<div class="bstreeview"></div>',
         treeviewItem: '<div role="treeitem" class="list-group-item" data-toggle="collapse"></div>',
         treeviewGroupItem: '<div role="group" class="list-group collapse" id="itemid"></div>',
+        treeviewGroupItemShow: '<div role="group" class="list-group collapse show" id="itemid"></div>',
         treeviewItemStateIcon: '<i class="state-icon"></i>',
         treeviewItemIcon: '<i class="item-icon"></i>',
         treeviewItemBadge: '<span class="badge badge-secondary badge-pill float-right"></span>',
@@ -120,6 +121,8 @@
             depth += 1;
             // Add each node and sub-nodes.
             $.each(nodes, function addNodes(id, node) {
+                const expanded = node.state && true === node.state.expanded;
+
                 // Main node element.
                 var treeItem = $(templates.treeviewItem)
                     .attr('data-target', "#" + _this.itemIdPrefix + node.nodeId)
@@ -128,8 +131,13 @@
                 // Set Expand and Collapse icones.
                 var treeItemStateIcon;
                 if (node.nodes) {
-                    treeItemStateIcon = $(templates.treeviewItemStateIcon)
-                        .addClass(_this.settings.collapseIcon);
+                    if(expanded) {
+                        treeItemStateIcon = $(templates.treeviewItemStateIcon)
+                            .addClass(_this.settings.expandIcon);
+                    } else {
+                        treeItemStateIcon = $(templates.treeviewItemStateIcon)
+                            .addClass(_this.settings.collapseIcon);
+                    }
                 } else {
                     treeItemStateIcon = $(templates.treeviewItemStateIcon)
                         .addClass(_this.settings.noNodesIcon);
@@ -177,8 +185,14 @@
                 // Build child nodes.
                 if (node.nodes) {
                     // Node group item.
-                    var treeGroup = $(templates.treeviewGroupItem)
-                        .attr('id', _this.itemIdPrefix + node.nodeId);
+                    if(expanded) {
+                        var treeGroup = $(templates.treeviewGroupItemShow)
+                            .attr('id', _this.itemIdPrefix + node.nodeId);
+                    } else {
+                        var treeGroup = $(templates.treeviewGroupItem)
+                            .attr('id', _this.itemIdPrefix + node.nodeId);
+                    }
+
                     parentElement.append(treeGroup);
                     _this.build(treeGroup, node.nodes, depth);
                 }
