@@ -70,7 +70,7 @@
             var _this = this;
             this.build($(this.element), this.tree, 0);
             // Update angle icon on collapse
-            $(this.element).on('click', '.list-group-item', function (e) {
+            $(this.element).off('click').on('click', '.list-group-item', function (e) {
                 $('.state-icon', this)
                     .toggleClass(_this.settings.expandIcon)
                     .toggleClass(_this.settings.collapseIcon);
@@ -138,7 +138,7 @@
                         treeItemStateIcon = $(templates.treeviewItemStateIcon)
                             .addClass(_this.settings.collapseIcon);
                     }
-                } else {
+                } else if(node.icon != '') {
                     treeItemStateIcon = $(templates.treeviewItemStateIcon)
                         .addClass(_this.settings.noNodesIcon);
                 }
